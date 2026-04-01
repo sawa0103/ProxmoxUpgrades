@@ -60916,6 +60916,12 @@ Ext.define('PVE.StdWorkspace', {
 			    return;
 			}
 			let treeNode = selected[0];
+			
+			// Skip content creation for tag folders and grouping nodes
+			if (treeNode.data.type === 'tag-folder' || treeNode.data.groupbyid) {
+			    return;
+			}
+			
 			let treeTypeToClass = {
 			    root: 'PVE.dc.Config',
 			    node: 'PVE.node.Config',
