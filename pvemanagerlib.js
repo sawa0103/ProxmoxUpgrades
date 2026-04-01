@@ -16428,7 +16428,12 @@ Ext.define('PVE.tree.ResourceTree', {
 
 	me.callParent();
 
-	me.getSelectionModel().on('select', (_sm, n) => sp.set(stateid, { value: n.data.id }));
+	me.getSelectionModel().on('select', (_sm, n) => {
+	    // Only persist state for actual resource nodes, not for tag folders or grouping nodes
+	    if (n.data.type !== 'tag-folder' && !n.data.groupbyid) {
+		sp.set(stateid, { value: n.data.id });
+	    }
+	});
 
 	rstore.on("load", updateTree);
 	rstore.startUpdate();
