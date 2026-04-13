@@ -16321,6 +16321,17 @@ Ext.define('PVE.tree.ResourceTree', {
 	Ext.apply(me, {
 	    allowSelection: true,
 	    store: store,
+	    columns: [
+		{
+		    xtype: 'treecolumn',
+		    text: gettext('Server View'),
+		    dataIndex: 'text',
+		    flex: 1,
+		    renderer: function(value, metaData, record) {
+			return record.data.text;
+		    },
+		},
+	    ],
 	    viewConfig: {
 		animate: false, // note: animate cause problems with applyState
 	    },
@@ -61244,4 +61255,3 @@ Ext.define('PVE.StdWorkspace', {
 	});
     },
 });
-
