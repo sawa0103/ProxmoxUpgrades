@@ -1,7 +1,8 @@
 # **Proxmox VE: Enhanced Tag-Based VM Organization**  
-**Version:** 1.0  
+**Version:** 1.1 (Fixed)
 **Author:** Gabriel Adams  
 **Date:** March 2025  
+**Fix Applied:** April 2026 - Resolved tag folder selection issue  
 
 ---
 
@@ -93,6 +94,20 @@ systemctl restart pvedaemon
 
 ### **Step 4: Refresh the Page**  
 Use **`CTRL + Shift + R`** to reload any cached frontend files in your browser.
+
+---
+
+## **Recent Fixes (v1.1)**
+
+### **Tag Folder Selection Issue - RESOLVED** ✅
+
+**Problem**: After clicking on a tag folder, clicking on a VM would cause the details panel to go blank with a console error: `Cannot read properties of undefined (reading 'replace')`
+
+**Solution**: Applied two fixes to properly handle tag folder selections:
+1. Tag folders no longer persist to application state (preventing invalid state restoration)
+2. Tag folder selections skip content panel creation (preventing the undefined error)
+
+**Result**: Tag folders now work as intended - they expand/collapse without breaking VM selection or causing errors.
 
 ---
 

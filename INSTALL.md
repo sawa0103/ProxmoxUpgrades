@@ -2,7 +2,11 @@
 
 ## What This Fix Does
 
-This update fixes the issue where clicking on a tag folder and then clicking on a VM would cause the VM details panel to go blank. The fix prevents tag folders from being saved to application state, allowing proper VM selection after folder navigation.
+This update fixes the issue where clicking on a tag folder and then clicking on a VM would cause the VM details panel to go blank and show a console error. 
+
+The fix includes **two critical changes**:
+1. **Prevents tag folders from being saved to application state** - Tag folder selections no longer persist across page refreshes
+2. **Skips content panel creation for tag folders** - Tag folders now only expand/collapse without trying to load content, preventing the `Cannot read properties of undefined (reading 'replace')` error
 
 ## Installation Steps
 
@@ -52,7 +56,8 @@ After installation, verify the fix works:
 ## What Changed
 
 **File**: `pvemanagerlib.js`
-**Line**: ~16431
+
+### Change 1: State Persistence Filter (Line ~16431)
 
 **Before**:
 ```javascript
@@ -69,7 +74,43 @@ me.getSelectionModel().on('select', (_sm, n) => {
 });
 ```
 
-**Explanation**: The fix adds a check to filter out tag folders (`type: 'tag-folder'`) and grouping nodes (`groupbyid`) before persisting selection state. This ensures only actual resources (VMs, containers, nodes) are saved to state, preventing the blank panel issue.
+**Explanation**: Filters out tag folders and grouping nodes before persisting selection state. Only actual resources (VMs, containers, nodes) are saved to state.
+
+### Change 2: Selection Change Handler (Line ~60920)
+
+**Before**:
+```javascript
+selectionchange: function(sm, selected) {
+    if (selected.length <= 0) {
+        return;
+    }
+    let treeNode = selected[0];
+    let treeTypeToClass = {
+        // ... mapping
+    };
+    // ... setContent call
+```
+
+**After**:
+```javascript
+selectionchange: function(sm, selected) {
+    if (selected.length <= 0) {
+        return;
+    }
+    let treeNode = selected[0];
+    
+    // Skip content creation for tag folders and grouping nodes
+    if (treeNode.data.type === 'tag-folder' || treeNode.data.groupbyid) {
+        return;
+    }
+    
+    let treeTypeToClass = {
+        // ... mapping
+    };
+    // ... setContent call
+```
+
+**Explanation**: Prevents content panel creation when tag folders or grouping nodes are selected. This stops the error `Cannot read properties of undefined (reading 'replace')` that occurred when trying to load help info for non-existent resources.
 
 ## Rollback
 
